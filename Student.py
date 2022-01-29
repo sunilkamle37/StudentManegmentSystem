@@ -193,8 +193,8 @@ class Login:
 
 
 		self.Student_table1 = ttk.Treeview(Table_Frame1,columns=("Roll", "Name","Present","Absent"),xscrollcommand=scroll_x.set, yscrollcommand=scroll_y.set)
-		scroll_x.place(x=1000,y=15,width=50,height=50)
-		scroll_y.place(x=10,y=200,width=50,height=50)
+		scroll_x.place(x=10,y=15,width=50,height=50)
+		scroll_y.place(x=10,y=20,width=50,height=50)
 		scroll_x.config(command=self.Student_table1.xview)
 		scroll_y.config(command=self.Student_table1.yview)
 
