@@ -3,6 +3,7 @@ from PIL import ImageTk
 from tkinter import ttk
 import pymysql
 from tkinter import messagebox
+from tkcalendar import DateEntry
 class Login:
 
 	def __init__(self,root):
@@ -114,11 +115,11 @@ class Login:
 			txt_Search = Entry(Detail_Frame, textvariable=self.search_txt, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
 			txt_Search.grid(row=0, column=2, pady=10, padx=10, sticky="w")
 
-			txt_Search = Entry(Detail_Frame, textvariable=self.fdate_var, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
-			txt_Search.grid(row=1, column=1, pady=10, padx=10, sticky="w")
+			fdate_field= DateEntry(Detail_Frame,selectmode='day',date_pattern="yyyy-mm-dd",textvariable=self.fdate_var, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
+			fdate_field.grid(row=1, column=1, pady=10, padx=10, sticky="w")
 
-			txt_Search = Entry(Detail_Frame, textvariable=self.ldate_var, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
-			txt_Search.grid(row=1, column=2, pady=10, padx=20, sticky="w")
+			ldate_field= DateEntry(Detail_Frame,selectmode='day',date_pattern="yyyy-mm-dd",textvariable=self.ldate_var, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
+			ldate_field.grid(row=1, column=2, pady=10, padx=20, sticky="w")
 
 			searchbtn = Button(Detail_Frame, text="Search", width=8, command=self.search_data).grid(row=0, column=3,padx=10, pady=10)
 			showallbtn = Button(Detail_Frame, text="Show All", width=8, command=self.fetch_data).grid(row=0, column=4,padx=10, pady=10)
