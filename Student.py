@@ -3,6 +3,7 @@ from PIL import ImageTk
 from tkinter import ttk
 import pymysql
 from tkinter import messagebox
+from tkinter.messagebox import showinfo
 from tkcalendar import DateEntry
 class Login:
 
@@ -85,7 +86,7 @@ class Login:
 
 			lbl_Dob = Label(newWindow, text="D.O.B", bg="#F11C79",fg="white",font=("times new roman", 20, "bold"))
 			lbl_Dob.grid(row=6, column=0, pady=10, padx=20, sticky="w")
-			txt_Dob = Entry(newWindow, textvariable=self.dob_var, font=("times new roman",10,"bold"),bd=5,relief=GROOVE)
+			txt_Dob = DateEntry(newWindow,date_pattern="yyyy-mm-dd",textvariable=self.dob_var, font=("times new roman",10,"bold"),bd=5,relief=GROOVE)
 			txt_Dob.grid(row=6, column=1, pady=10, padx=20, sticky="w")
 
 			lbl_Address = Label(newWindow, text="Address", bg="#F11C79", fg="white",font=("times new roman", 20, "bold"))
@@ -102,29 +103,50 @@ class Login:
 			Clearbtn = Button(btn_Frame, text="Clear", width=9, command=self.clear).grid(row=0, column=3, padx=10,pady=10)
 			attendancebtn = Button(btn_Frame,text="For Attendence Click Here",bg="black",relief=RIDGE,fg="white",command=self.attendance_function).grid(row=1,column=1)
 
-			Detail_Frame = Frame(newWindow, bd=4, relief=RIDGE, bg="#F11C79")
-			Detail_Frame.place(x=500,y=0,width=830,height=600)
+			self.Detail_Frame = Frame(newWindow, bd=4, relief=RIDGE, bg="#F11C79")
+			self.Detail_Frame.place(x=500,y=0,width=830,height=600)
 
-			lbl_search = Label(Detail_Frame, text="Search By", bg="#F11C79", fg="white",font=("times new roman", 20, "bold"))
+			lbl_search = Label(self.Detail_Frame, text="Search By", bg="#F11C79", fg="white",font=("times new roman", 20, "bold"))
 			lbl_search.grid(row=0, column=0, pady=10, padx=20, sticky="w")
 
-			combo_search =ttk.Combobox(Detail_Frame,textvariable=self.search_by,width=10,font=("times new roman",13,"bold"),state='readonly')
+			combo_search =ttk.Combobox(self.Detail_Frame,textvariable=self.search_by,width=10,font=("times new roman",13,"bold"),state='readonly')
 			combo_search['values']=("Roll_no","Name","Contact","Date")
 			combo_search.grid(row=0,column=1,pady=10,padx=20,sticky="w")
 
-			txt_Search = Entry(Detail_Frame, textvariable=self.search_txt, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
+			def status_changed(event):
+				print(self.search_by.get())
+				if self.search_by.get()=="Date":
+					print("True Block of Date")
+					txt_Search.grid_forget()
+					fdate_field.grid(row=1, column=1, pady=10, padx=10, sticky="w")
+					ldate_field.grid(row=1, column=2, pady=10, padx=20, sticky="w")
+				elif self.search_by.get()=="Roll_no" or self.search_by.get()=="Name" or self.search_by.get()=="Contact":
+					fdate_field.grid_forget()
+					ldate_field.grid_forget()
+					txt_Search.grid(row=0, column=2, pady=10, padx=10, sticky="w")
+
+				showinfo(
+					title='Result',
+					message=f'You selected {self.search_by.get()}!',parent=self.Detail_Frame
+				)
+
+			combo_search.bind('<<ComboboxSelected>>', status_changed)
+
+
+
+			txt_Search = Entry(self.Detail_Frame, textvariable=self.search_txt, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
 			txt_Search.grid(row=0, column=2, pady=10, padx=10, sticky="w")
 
-			fdate_field= DateEntry(Detail_Frame,selectmode='day',date_pattern="yyyy-mm-dd",textvariable=self.fdate_var, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
+			fdate_field = DateEntry(self.Detail_Frame, selectmode='day', date_pattern="yyyy-mm-dd",textvariable=self.fdate_var, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
 			fdate_field.grid(row=1, column=1, pady=10, padx=10, sticky="w")
 
-			ldate_field= DateEntry(Detail_Frame,selectmode='day',date_pattern="yyyy-mm-dd",textvariable=self.ldate_var, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
+			ldate_field = DateEntry(self.Detail_Frame, selectmode='day', date_pattern="yyyy-mm-dd",textvariable=self.ldate_var, font=("times new roman", 13, "bold"), bd=5,relief=GROOVE)
 			ldate_field.grid(row=1, column=2, pady=10, padx=20, sticky="w")
 
-			searchbtn = Button(Detail_Frame, text="Search", width=8, command=self.search_data).grid(row=0, column=3,padx=10, pady=10)
-			showallbtn = Button(Detail_Frame, text="Show All", width=8, command=self.fetch_data).grid(row=0, column=4,padx=10, pady=10)
+			searchbtn = Button(self.Detail_Frame, text="Search", width=8, command=self.search_data).grid(row=0, column=3,padx=10, pady=10)
+			showallbtn = Button(self.Detail_Frame, text="Show All", width=8, command=self.fetch_data).grid(row=0, column=4,padx=10, pady=10)
 
-			Table_Frame = Frame(Detail_Frame, bd=4, relief=RIDGE, bg="#F11C79")
+			Table_Frame = Frame(self.Detail_Frame, bd=4, relief=RIDGE, bg="#F11C79")
 			Table_Frame.place(x=10,y=95, width=760, height=500)
 
 			scroll_x = Scrollbar(Table_Frame, orient=HORIZONTAL)
@@ -154,10 +176,6 @@ class Login:
 			self.Student_table.pack(fill=BOTH, expand=1)
 			self.Student_table.bind("<ButtonRelease-1>", self.get_cursor)
 			self.fetch_data()
-
-
-
-
 
 
 	def attendance_function(self):
@@ -321,10 +339,15 @@ class Login:
 			cur.execute("select * from students where " + str(self.search_by.get()) + " LIKE '%" + str(
 				self.search_txt.get()) + "%'")
 			rows = cur.fetchall()
+			# print(len(rows))
 			if len(rows) != 0:
 				self.Student_table.delete(*self.Student_table.get_children())
 				for row in rows:
+					print(row)
 					self.Student_table.insert('', END, values=row)
+			elif len(rows)==0:
+				messagebox.showinfo("Information", "No Results Founds", parent=self.Detail_Frame)
+
 			con.commit()
 			con.close()
 		elif self.search_by.get()=="Date":
@@ -336,6 +359,8 @@ class Login:
 				self.Student_table.delete(*self.Student_table.get_children())
 				for row in rows:
 					self.Student_table.insert('', END, values=row)
+			elif len(rows)==0:
+				messagebox.showinfo("Information", "No Results Founds", parent=self.Detail_Frame)
 			con.commit()
 			con.close()
 
